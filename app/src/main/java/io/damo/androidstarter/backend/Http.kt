@@ -16,6 +16,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okhttp3.ResponseBody
 import java.io.IOException
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.module.kotlin.readValue
 
 fun requestBuilder(url: String): Request.Builder =
     Request.Builder().url(url)
@@ -76,6 +78,10 @@ val okHttp =
 val objectMapper: ObjectMapper =
     jacksonObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+fun Any.asJson() = objectMapper.writeValueAsString(this)
+
+inline fun <reified T> String.fromJson(): T = objectMapper.readValue(this)
 
 val jsonMediaType: MediaType =
     "application/json".toMediaType()

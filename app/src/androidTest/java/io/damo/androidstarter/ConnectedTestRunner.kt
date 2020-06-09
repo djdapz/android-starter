@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.ActivityTestRule
 import io.damo.androidstarter.categories.CategoriesTabTest
+import io.damo.androidstarter.favorites.FavoritesTest
 import io.damo.androidstarter.instrumentationsupport.TestAppContext
 import io.damo.androidstarter.randomjoke.RandomJokeTabTest
 import org.junit.Before
@@ -21,7 +22,7 @@ class ConnectedTestRunner {
         ActivityTestRule(ConnectedTestStartActivity::class.java)
 
     lateinit var app: StarterApp
-    lateinit var testAppContext: TestAppContext
+    private lateinit var testAppContext: TestAppContext
 
     @Before
     fun setUp() {
@@ -48,12 +49,18 @@ class ConnectedTestRunner {
             { RandomJokeTabTest(testAppContext).testCreation_RefreshingTheJoke() },
             { RandomJokeTabTest(testAppContext).testCreation_OnLoadFailure() },
 
-            { CategoriesTabTest(testAppContext).testNavigation() }
+            { CategoriesTabTest(testAppContext).testNavigation() },
+
+            { FavoritesTest(testAppContext).testRemoveFavorites() },
+            { FavoritesTest(testAppContext).testAddFavoriteFromRandom() },
+            { FavoritesTest(testAppContext).testAddFavoriteFromCategory() },
+            { FavoritesTest(testAppContext).testFavoritesHoldsDefaultFavorites() },
+            { FavoritesTest(testAppContext).testNavigation() }
         )
 
         allTests.forEach { test ->
             reset()
-            test()
+            test()  
         }
     }
 

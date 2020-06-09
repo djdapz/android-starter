@@ -9,4 +9,10 @@
     <string name="categories_title">Jokes by Category</string>
     <string name="category_title">%s Jokes</string>
     <string name="generic_error">An error occurred, please try again later.</string>
+    <string name="favorites">Favorites</string>
+    <string name="favorites_title">Favorite Jokes</string>
+    <string name="save_favorite">Add To Favorites</string>
+    <string name="love"><![CDATA[<3]]></string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove From Favorites</string>
 </resources>

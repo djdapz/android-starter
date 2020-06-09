@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_FADE
 import androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN
 import androidx.fragment.app.commit
 import io.damo.androidstarter.categories.CategoriesTabFragment
 import io.damo.androidstarter.categories.CategoryJokesFragment
 import io.damo.androidstarter.categories.CategoryView
+import io.damo.androidstarter.favorites.FavoritesTabFragment
 import io.damo.androidstarter.randomjoke.RandomJokeTabFragment
 import kotlinx.android.synthetic.main.activity_main.bottomNavigation
 
@@ -67,13 +69,20 @@ class MainActivity :
         when (itemId) {
             R.id.categoriesNavigationItem -> switchTab(Tab.Categories)
             R.id.randomNavigationItem -> switchTab(Tab.Random)
+            R.id.favoritesNavigationItem -> switchTab(Tab.Favorites)
             else -> false
         }
+
+    private fun clearBackStack() =
+        supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+
 
     private fun switchTab(tab: Tab): Boolean {
         supportFragmentManager.commit {
             replace(R.id.fragment, tab.fragment)
             setTransition(TRANSIT_FRAGMENT_FADE)
+            clearBackStack()
         }
         return true
     }
@@ -81,5 +90,6 @@ class MainActivity :
     enum class Tab(val fragment: Fragment) {
         Random(RandomJokeTabFragment()),
         Categories(CategoriesTabFragment()),
+        Favorites(FavoritesTabFragment()),
     }
 }

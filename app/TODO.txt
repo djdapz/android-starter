@@ -1,0 +1,3 @@
+TODO - back button on Favorites
+TODO - toggle favorites from random
+TODO - toggle favorites from categories

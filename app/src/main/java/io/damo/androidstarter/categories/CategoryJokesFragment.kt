@@ -37,7 +37,7 @@ class CategoryJokesFragment : Fragment() {
     }
 
     private fun setupView(activity: Activity, categoryName: String) {
-        val adapter = CategoryJokesListAdapter(activity)
+        val adapter = CategoryJokesListAdapter(activity, this)
         val viewModel = activityViewModelProvider.get<CategoryJokesViewModel>()
 
         activity.title = getString(R.string.category_title, categoryName)

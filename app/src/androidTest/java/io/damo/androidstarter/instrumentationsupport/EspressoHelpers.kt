@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.By
@@ -13,6 +14,7 @@ import androidx.test.uiautomator.Until
 import io.damo.androidstarter.R
 import io.damo.androidstarter.StarterApp
 import junit.framework.TestCase.fail
+import org.hamcrest.CoreMatchers
 
 fun startMainActivity() {
     onView(withId(R.id.startMainActivity)).perform(click())
@@ -32,6 +34,17 @@ fun stringFromResId(@StringRes stringRes: Int): String =
     ApplicationProvider
         .getApplicationContext<StarterApp>()
         .getString(stringRes)
+
+fun checkForCountOfText(text: String, count: Int) =
+    if (count == 0) checkForAbsenceOfText(text)
+    else device()
+        .wait(Until.findObjects(By.textContains(text)), 0)
+        ?.run { ViewMatchers.assertThat("Wrong Count", size, CoreMatchers.`is`(count)) }
+        ?: fail("Timed out waiting for object with text : $text")
+
+fun checkForAbsenceOfText(text: String) = device()
+    .wait(Until.findObjects(By.textContains(text)), 0)
+    ?.run { fail("Expected 0, Found $size occurrences of your text: $text") }
 
 fun checkForText(string: String) = waitForText(string, 0)
 

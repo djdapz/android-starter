@@ -4,10 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.damo.androidstarter.AppPreferences
 import io.damo.androidstarter.backend.JokeApi
-import io.damo.androidstarter.support.LiveRemoteData
-import io.damo.androidstarter.support.Result
-import io.damo.androidstarter.support.createLiveRemoteData
-import io.damo.androidstarter.support.loadWith
+import io.damo.androidstarter.support.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +19,14 @@ class RandomJokeViewModel(
     private val joke = createLiveRemoteData(cachedJoke())
 
     fun joke(): LiveRemoteData<JokeView> = joke
+
+    fun jokeText(): String? = when (val value = joke.value) {
+        is RemoteData.Loaded -> value.data.content
+        is RemoteData.NotLoaded -> null
+        is RemoteData.Loading -> null
+        is RemoteData.Error -> null
+        null -> null
+    }
 
     fun loadJoke() =
         viewModelScope.launch {

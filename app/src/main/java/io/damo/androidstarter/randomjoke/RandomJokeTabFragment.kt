@@ -4,10 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.get
 import io.damo.androidstarter.R
 import io.damo.androidstarter.activityViewModelProvider
+import io.damo.androidstarter.appComponent
+import io.damo.androidstarter.favorites.FavoritesRepo
 import io.damo.androidstarter.support.RemoteData
 import io.damo.androidstarter.support.RemoteData.Error
 import io.damo.androidstarter.support.RemoteData.Loaded
@@ -19,23 +23,56 @@ import kotlinx.android.synthetic.main.fragment_random_joke_tab.swipeRefresh
 
 class RandomJokeTabFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
         inflater.inflate(R.layout.fragment_random_joke_tab, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         activity?.title = getString(R.string.random_title)
 
-        val viewModel = activityViewModelProvider.get<RandomJokeViewModel>()
+        val jokeViewModel = activityViewModelProvider.get<RandomJokeViewModel>()
+        val favoritesService = appComponent.favoritesRepo
 
-        viewModel.joke().observe(this) { jokeData ->
-            loadJokeIfNeeded(jokeData, viewModel)
+        jokeViewModel.joke().observe(this) { jokeData ->
+            loadJokeIfNeeded(jokeData, jokeViewModel)
             updateJokeTextView(jokeData)
             updateSwipeRefresh(jokeData)
+            updateFavoriteButtonState(jokeData, favoritesService, view)
         }
 
         swipeRefresh.setOnRefreshListener {
-            viewModel.loadJoke()
+            jokeViewModel.loadJoke()
         }
+
+        view.findViewById<Button>(R.id.addToFavorites).setOnClickListener {
+            jokeViewModel.jokeText()?.let { favoritesService.add(it) }
+        }
+
+        favoritesService.liveData().observe(this) { favorites ->
+            jokeViewModel.jokeText()?.let {
+                if (favorites.contains(it)) {
+                    view.findViewById<Button>(R.id.addToFavorites).isVisible = false
+                }
+            }
+        }
+    }
+
+    private fun updateFavoriteButtonState(
+        jokeData: RemoteData<JokeView>,
+        favoritesService: FavoritesRepo,
+        view: View
+    ) {
+        val isVisible: Boolean = when (jokeData) {
+            is NotLoaded -> false
+            is Loading -> false
+            is Loaded -> !favoritesService.getFavorites().contains(jokeData.data.content)
+            is Error -> false
+        }
+        view.findViewById<Button>(R.id.addToFavorites).isVisible = isVisible
+
     }
 
     private fun updateSwipeRefresh(jokeData: RemoteData<JokeView>) {

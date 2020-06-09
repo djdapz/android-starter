@@ -5,7 +5,7 @@
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/jokeInCategoryList"
+        android:id="@+id/savedJoke"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -14,12 +14,11 @@
         android:textSize="14sp" />
 
     <ImageButton
-        android:id="@+id/favoriteJoke"
+        android:id="@+id/removeFromFavorites"
         android:layout_width="40dp"
         android:layout_height="match_parent"
-        android:contentDescription="@string/add_to_favorites"
         android:background="@color/colorClear"
-        android:src="@drawable/heart"
-        android:tint="@color/colorPrimary"
-        android:visibility="gone" />
+        android:contentDescription="@string/remove_from_favorites"
+        android:src="@drawable/delete"
+        android:tint="@color/colorPrimary" />
 </LinearLayout>
