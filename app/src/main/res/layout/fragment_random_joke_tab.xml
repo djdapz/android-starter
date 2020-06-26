@@ -21,5 +21,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/save_favorite" />
+        <TextView
+            android:id="@+id/jokeTextasdfasdf"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/bigPadding"
+            android:textAlignment="center" />
+
     </LinearLayout>
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

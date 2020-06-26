@@ -1,6 +1,7 @@
 package io.damo.androidstarter.instrumentationsupport
 
 import io.damo.androidstarter.StarterApp
+import io.damo.androidstarter.favorites.Favorite
 
 class TestAppContext(val app: StarterApp) {
 
@@ -15,7 +16,10 @@ class TestAppContext(val app: StarterApp) {
         testComponent.shutdownServer()
         testComponent.appPreferences.clear()
 
-        baseFavorites.forEach { testComponent.favoritesRepo.add(it) }
+        baseFavorites.forEach {
+            testComponent.favoritesRepo
+                .save(Favorite(it))
+        }
     }
 
     companion object {

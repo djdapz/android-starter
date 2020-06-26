@@ -3,7 +3,7 @@ package io.damo.androidstarter
 import android.content.Context
 import android.content.SharedPreferences
 import io.damo.androidstarter.instrumentationsupport.TestAppContext
-import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Java6Assertions.assertThat
 
 class AppPreferencesTest(testAppContext: TestAppContext) {
 

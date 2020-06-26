@@ -7,14 +7,24 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.lifecycle.LifecycleOwner
 import io.damo.androidstarter.R
-import io.damo.androidstarter.appComponent
+import io.damo.androidstarter.support.observe
 
-class FavoritesListAdapter(context: Context) :
+class FavoritesListAdapter(
+    context: Context,
+    lifecycleOwner: LifecycleOwner,
+    private val favoritesRepo: FavoritesRepo
+) :
     BaseAdapter() {
 
     private val layoutInflater = LayoutInflater.from(context)
-    private val favoritesRepo = context.appComponent.favoritesRepo
+
+    init {
+        favoritesRepo.favoritesSubscription.observe(lifecycleOwner) {
+            this.notifyDataSetChanged()
+        }
+    }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = convertView ?: layoutInflater.inflate(
@@ -26,21 +36,27 @@ class FavoritesListAdapter(context: Context) :
         val textView: TextView = view.findViewById(R.id.savedJoke) as TextView
         val button: ImageButton = view.findViewById(R.id.removeFromFavorites) as ImageButton
 
-        val favorite: String = getItem(position) as String
+        val favorite: Favorite = getItem(position) as Favorite
 
-        textView.text = favorite
+        textView.text = favorite.joke
         button.setOnClickListener {
-            favoritesRepo.remove(favorite)
-            this.notifyDataSetChanged()
+            val deletingJokeId = favoritesRepo.getFavorites()[position].id
+            favoritesRepo.remove(deletingJokeId)
         }
 
         return view
     }
 
-    override fun getItem(position: Int): Any = favoritesRepo.getFavorites()[position]
+    override fun getItem(position: Int): Any {
+        return favoritesRepo.getFavorites()[position]
+    }
 
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemId(position: Int): Long {
+        return position.toLong()
+    }
 
-    override fun getCount(): Int = favoritesRepo.getFavorites().size
+    override fun getCount(): Int {
+        return favoritesRepo.getFavorites().size
+    }
 
 }

@@ -11,6 +11,7 @@ import androidx.lifecycle.get
 import io.damo.androidstarter.R
 import io.damo.androidstarter.activityViewModelProvider
 import io.damo.androidstarter.appComponent
+import io.damo.androidstarter.favorites.Favorite
 import io.damo.androidstarter.favorites.FavoritesRepo
 import io.damo.androidstarter.support.RemoteData
 import io.damo.androidstarter.support.RemoteData.Error
@@ -34,13 +35,13 @@ class RandomJokeTabFragment : Fragment() {
         activity?.title = getString(R.string.random_title)
 
         val jokeViewModel = activityViewModelProvider.get<RandomJokeViewModel>()
-        val favoritesService = appComponent.favoritesRepo
+        val favoritesRepo = appComponent.favoritesRepo
 
         jokeViewModel.joke().observe(this) { jokeData ->
             loadJokeIfNeeded(jokeData, jokeViewModel)
             updateJokeTextView(jokeData)
             updateSwipeRefresh(jokeData)
-            updateFavoriteButtonState(jokeData, favoritesService, view)
+            updateFavoriteButtonState(jokeData, favoritesRepo, view)
         }
 
         swipeRefresh.setOnRefreshListener {
@@ -48,15 +49,25 @@ class RandomJokeTabFragment : Fragment() {
         }
 
         view.findViewById<Button>(R.id.addToFavorites).setOnClickListener {
-            jokeViewModel.jokeText()?.let { favoritesService.add(it) }
+            jokeViewModel.jokeText()?.let {
+                favoritesRepo.save(it)
+            }
         }
 
-        favoritesService.liveData().observe(this) { favorites ->
-            jokeViewModel.jokeText()?.let {
-                if (favorites.contains(it)) {
-                    view.findViewById<Button>(R.id.addToFavorites).isVisible = false
-                }
-            }
+        favoritesRepo.favoritesSubscription.observe(this) { favorites: List<Favorite> ->
+            updateFavoriteButtonVisibility(jokeViewModel, favorites, view)
+        }
+    }
+
+    private fun updateFavoriteButtonVisibility(
+        jokeViewModel: RandomJokeViewModel,
+        favorites: List<Favorite>,
+        view: View
+    ) {
+        jokeViewModel.jokeText()?.let { joke ->
+            if (favorites.map { it.joke }.contains(joke)) {
+            view.findViewById<Button>(R.id.addToFavorites).isVisible = false
+        }
         }
     }
 
@@ -68,8 +79,9 @@ class RandomJokeTabFragment : Fragment() {
         val isVisible: Boolean = when (jokeData) {
             is NotLoaded -> false
             is Loading -> false
-            is Loaded -> !favoritesService.getFavorites().contains(jokeData.data.content)
             is Error -> false
+            is Loaded -> favoritesService.getFavorites()
+                .firstOrNull { it.joke == jokeData.data.content } == null
         }
         view.findViewById<Button>(R.id.addToFavorites).isVisible = isVisible
 

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.get
 import io.damo.androidstarter.R
 import io.damo.androidstarter.activityViewModelProvider
+import io.damo.androidstarter.appComponent
 import io.damo.androidstarter.support.observe
 import kotlinx.android.synthetic.main.fragment_category_jokes.categoryJokesList
 
@@ -26,7 +27,11 @@ class CategoryJokesFragment : Fragment() {
         fun Bundle.getCategoryName() = getString(categoryNameKey)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View =
         inflater.inflate(R.layout.fragment_category_jokes, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -37,8 +42,9 @@ class CategoryJokesFragment : Fragment() {
     }
 
     private fun setupView(activity: Activity, categoryName: String) {
-        val adapter = CategoryJokesListAdapter(activity, this)
         val viewModel = activityViewModelProvider.get<CategoryJokesViewModel>()
+
+        val adapter = CategoryJokesListAdapter(activity, this, appComponent.favoritesRepo)
 
         activity.title = getString(R.string.category_title, categoryName)
         categoryJokesList.adapter = adapter

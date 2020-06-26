@@ -5,8 +5,11 @@ import io.damo.androidstarter.AppComponent
 import io.damo.androidstarter.DefaultAppComponent
 import io.damo.androidstarter.ViewModelFactory
 import io.damo.androidstarter.backend.JokeApi
+import io.damo.androidstarter.favorites.FavoritesRepo
+import io.damo.androidstarter.favorites.FavoritesRoomRepo
 
 class TestAppComponent(app: Application) : AppComponent by DefaultAppComponent(app) {
+
 
     val testDispatcher = TestDispatcher()
 
@@ -14,6 +17,7 @@ class TestAppComponent(app: Application) : AppComponent by DefaultAppComponent(a
     private val baseUrl = mockServer.baseUrl()
 
     override val jokeApi = JokeApi(baseUrl)
+    override val favoritesRepo: FavoritesRepo = FavoritesRoomRepo.initialize(app)
     override val viewModelFactory = ViewModelFactory(this)
 
     fun shutdownServer() {

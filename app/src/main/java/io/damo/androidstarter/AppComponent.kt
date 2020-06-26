@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModelProvider
 import io.damo.androidstarter.backend.JokeApi
 import io.damo.androidstarter.favorites.FavoritesRepo
+import io.damo.androidstarter.favorites.FavoritesRoomRepo
 
 interface AppComponent {
     val jokeApi: JokeApi
@@ -16,5 +17,5 @@ class DefaultAppComponent(app: Application) : AppComponent {
     override val jokeApi = JokeApi(BuildConfig.API_URL)
     override val appPreferences: AppPreferences = AppPreferences(app)
     override val viewModelFactory = ViewModelFactory(this)
-    override val favoritesRepo = FavoritesRepo(app)
+    override val favoritesRepo: FavoritesRepo = FavoritesRoomRepo.initialize(app)
 }

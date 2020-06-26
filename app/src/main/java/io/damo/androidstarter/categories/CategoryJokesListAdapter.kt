@@ -10,11 +10,12 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.LifecycleOwner
 import io.damo.androidstarter.R
-import io.damo.androidstarter.appComponent
 import io.damo.androidstarter.categories.CategoryJokesListAdapter.Cell.ErrorCell
 import io.damo.androidstarter.categories.CategoryJokesListAdapter.Cell.LoadedCell
 import io.damo.androidstarter.categories.CategoryJokesListAdapter.Cell.LoadingCell
 import io.damo.androidstarter.categories.CategoryJokesListAdapter.Cell.NotLoadedCell
+import io.damo.androidstarter.favorites.Favorite
+import io.damo.androidstarter.favorites.FavoritesRepo
 import io.damo.androidstarter.randomjoke.JokeView
 import io.damo.androidstarter.support.Explanation
 import io.damo.androidstarter.support.RemoteData
@@ -26,18 +27,18 @@ import io.damo.androidstarter.support.observe
 
 class CategoryJokesListAdapter(
     private val context: Context,
-    private val lifecycleOwner: LifecycleOwner
+    private val lifecycleOwner: LifecycleOwner,
+    private val favoritesRepo: FavoritesRepo
 ) : BaseAdapter() {
 
     private val layoutInflater = LayoutInflater.from(context)
-    private val appComponent = context.appComponent
-    private val favoritesRepo = appComponent.favoritesRepo
 
     var remoteData: RemoteData<List<JokeView>> = NotLoaded()
         set(newData) {
             field = newData
             notifyDataSetChanged()
         }
+
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val view = convertView ?: layoutInflater.inflate(R.layout.cell_category_joke, parent, false)
@@ -56,17 +57,20 @@ class CategoryJokesListAdapter(
     }
 
     private fun setupButtonListeners(viewHolder: ViewHolder, text: String) {
-        val canFavorite = !favoritesRepo.getFavorites().contains(text)
+        val favoritesList = favoritesRepo.getFavorites()
+        val canFavorite = !favoritesList.hasJoke(text)
         if (canFavorite) {
             viewHolder.button.isVisible = true
-            viewHolder.button.setOnClickListener { favoritesRepo.add(text) }
-            favoritesRepo.liveData().observe(lifecycleOwner, {
-                if (it.contains(text)) {
+            viewHolder.button.setOnClickListener { favoritesRepo.save(text) }
+            favoritesRepo.favoritesSubscription.observe(lifecycleOwner, {
+                if (it.hasJoke(text)) {
                     viewHolder.button.isVisible = false
                 }
             })
         }
     }
+
+    fun List<Favorite>.hasJoke(joke: String) = map { it.joke }.contains(joke)
 
     override fun getItem(position: Int): Any =
         getCell(position)

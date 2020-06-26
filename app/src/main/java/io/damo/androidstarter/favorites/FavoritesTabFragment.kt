@@ -6,7 +6,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.get
 import io.damo.androidstarter.R
+import io.damo.androidstarter.activityViewModelProvider
 import io.damo.androidstarter.appComponent
 import kotlinx.android.synthetic.main.fragment_favorites.*
 
@@ -25,7 +27,7 @@ class FavoritesTabFragment : Fragment() {
 
     private fun setupView(activity: Activity) {
         activity.title = getString(R.string.favorites_title)
-
-        favoritesList.adapter = FavoritesListAdapter(requireContext())
+        favoritesList.adapter =
+            FavoritesListAdapter(requireContext(), this, appComponent.favoritesRepo)
     }
 }
